@@ -6,27 +6,6 @@
 <title>Sunum Planı</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script>
-  // ============================================================
-  //  BURAYI DÜZENLE — sadece bu bloğu değiştirmen yeterli
-  // ============================================================
-  const ODEV = {
-    isim: "Rabia",                       // Ona hitap edilecek isim
-    ders: "Ders adı",                    // Örn: "Sosyoloji"
-    konu: "Sunumun konusu buraya",       // Ana konu
-    teslimTarihi: "",                    // Örn: "2026-11-15" (boş bırakılabilir)
-    not: "Sen yaparsın, ben hep yanındayım. ❤️",
-    basliklar: [
-      { baslik: "Giriş", aciklama: "Konuyu tanıt, neden önemli olduğunu anlat." },
-      { baslik: "Tarihçe / Arka Plan", aciklama: "Konunun ortaya çıkışı ve gelişimi." },
-      { baslik: "Temel Kavramlar", aciklama: "Bilinmesi gereken ana terimler." },
-      { baslik: "Örnekler", aciklama: "Güncel ya da çarpıcı örnekler ver." },
-      { baslik: "Sonuç", aciklama: "Kısa bir özet ve kendi yorumun." },
-      { baslik: "Kaynakça", aciklama: "Kullandığın kaynakları listele." }
-    ]
-  };
-  // ============================================================
-</script>
 <style>
   :root {
     --bg: #fdf6f4;
@@ -34,6 +13,7 @@
     --ink: #2b1d22;
     --muted: #7a6469;
     --accent: #d6456b;
+    --accent-ink: #ffffff;
     --accent-soft: #fbe3ea;
     --line: #f0dde2;
     --done: #3a9a6b;
@@ -41,12 +21,12 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #1c1417; --card: #261b1f; --ink: #f6eaed; --muted: #b59aa2;
-      --accent: #ff7096; --accent-soft: #3d2128; --line: #3a2a2f; --done: #5fcb93;
+      --accent: #ff7096; --accent-ink: #1c1417; --accent-soft: #3d2128; --line: #3a2a2f; --done: #5fcb93;
     }
   }
   :root[data-theme="dark"] {
     --bg: #1c1417; --card: #261b1f; --ink: #f6eaed; --muted: #b59aa2;
-    --accent: #ff7096; --accent-soft: #3d2128; --line: #3a2a2f; --done: #5fcb93;
+    --accent: #ff7096; --accent-ink: #1c1417; --accent-soft: #3d2128; --line: #3a2a2f; --done: #5fcb93;
   }
   * { box-sizing: border-box; }
   body {
@@ -56,13 +36,31 @@
   main { max-width: 640px; margin: 0 auto; padding: 40px 16px 64px; }
   .hello { color: var(--accent); font-weight: 600; margin: 0 0 4px; }
   h1 { font-family: Fraunces, Georgia, serif; font-size: clamp(28px, 7vw, 40px); line-height: 1.15; margin: 0 0 8px; }
-  .meta { color: var(--muted); font-size: 15px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
-  .pill { background: var(--accent-soft); color: var(--accent); padding: 2px 10px; border-radius: 999px; font-weight: 600; font-size: 13px; }
-  .progress { margin: 28px 0 12px; }
+  .lead { color: var(--muted); margin: 0 0 24px; }
+
+  form { display: grid; gap: 10px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+  input[type=text], textarea {
+    width: 100%; font: inherit; color: var(--ink); background: var(--card);
+    border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  input[type=text]:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-weight: 600; border: 0; border-radius: 12px; padding: 12px 18px; cursor: pointer;
+    background: var(--accent); color: var(--accent-ink);
+  }
+  button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); }
+  button:disabled { opacity: .6; cursor: default; }
+  .status { min-height: 1.5em; color: var(--muted); font-size: 14px; margin: 12px 0 0; }
+
+  #result[hidden] { display: none; }
+  .topic { font-family: Fraunces, Georgia, serif; font-size: 22px; margin: 32px 0 4px; }
+  .progress { margin: 16px 0 12px; }
   .progress-top { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin-bottom: 6px; }
   .bar { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
   .bar > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
-  h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 32px 0 12px; }
   ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
   li label {
     display: flex; gap: 14px; align-items: flex-start; cursor: pointer;
@@ -75,84 +73,186 @@
     display: grid; place-items: center; font-weight: 600; font-size: 14px;
     background: var(--accent-soft); color: var(--accent);
   }
-  input[type=checkbox] { position: absolute; opacity: 0; pointer-events: none; }
-  input:checked + label .num { background: var(--done); color: #fff; }
-  input:checked + label .title { text-decoration: line-through; color: var(--muted); }
-  input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+  li input[type=checkbox] { position: absolute; opacity: 0; pointer-events: none; }
+  li input:checked + label .num { background: var(--done); color: #fff; }
+  li input:checked + label .title { text-decoration: line-through; color: var(--muted); }
+  li input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
   .title { font-weight: 600; }
   .desc { color: var(--muted); font-size: 14px; margin-top: 2px; }
-  .note {
-    margin-top: 32px; padding: 18px 20px; border-radius: 14px;
-    background: var(--accent-soft); font-family: Fraunces, Georgia, serif; font-size: 18px;
-  }
+  .tips { margin-top: 20px; padding: 16px 18px; border-radius: 14px; background: var(--accent-soft); font-size: 15px; }
+  .tips strong { display: block; margin-bottom: 4px; }
   .celebrate { display: none; text-align: center; margin-top: 16px; font-weight: 600; color: var(--done); }
   .celebrate.show { display: block; }
+  .actions { margin-top: 20px; }
+  .note { margin-top: 40px; text-align: center; font-family: Fraunces, Georgia, serif; color: var(--muted); }
 </style>
 </head>
 <body>
 <main>
-  <p class="hello" id="hello"></p>
-  <h1 id="konu"></h1>
-  <div class="meta" id="meta"></div>
+  <p class="hello">Merhaba Rabia 💕</p>
+  <h1>Sunumunu birlikte planlayalım</h1>
+  <p class="lead">Konunu yaz, sana o konuya özel başlıkları önereyim. Bitirdiklerini işaretleyerek ilerlemeni takip edebilirsin.</p>
 
-  <div class="progress">
-    <div class="progress-top"><span>İlerleme</span><span id="count"></span></div>
-    <div class="bar"><span id="fill"></span></div>
-  </div>
+  <form id="form">
+    <div class="field">
+      <label for="konu">Sunumun / ödevin konusu</label>
+      <input type="text" id="konu" placeholder="Örn: Yapay zekânın eğitime etkileri" required autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="detay">Ek bilgi (isteğe bağlı)</label>
+      <textarea id="detay" placeholder="Ders adı, süre, kaç slayt, hocanın istekleri…"></textarea>
+    </div>
+    <div class="row">
+      <button type="submit" id="go">Başlıkları öner</button>
+      <button type="button" class="ghost" id="stop" hidden>Durdur</button>
+    </div>
+  </form>
+  <p class="status" id="status" aria-live="polite"></p>
 
-  <h2>Hazırlaman gereken başlıklar</h2>
-  <ol id="list"></ol>
-  <p class="celebrate" id="celebrate">Hepsi tamam! Harikasın 🎉</p>
+  <section id="result" hidden>
+    <p class="topic" id="topicTitle"></p>
+    <div class="progress">
+      <div class="progress-top"><span>İlerleme</span><span id="count"></span></div>
+      <div class="bar"><span id="fill"></span></div>
+    </div>
+    <ol id="list"></ol>
+    <p class="celebrate" id="celebrate">Hepsi tamam! Harikasın 🎉</p>
+    <div class="tips" id="tips" hidden><strong>Küçük ipuçları</strong><span id="tipsText"></span></div>
+    <div class="actions"><button type="button" class="ghost" id="again">Başka öneriler getir</button></div>
+  </section>
 
-  <div class="note" id="note"></div>
+  <p class="note">Sen yaparsın, ben hep yanındayım. ❤️</p>
 </main>
 <script>
   const $ = id => document.getElementById(id);
-  const KEY = "odev-ilerleme:" + ODEV.konu;
-  let done = [];
-  try { done = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+  const STORE = "sunum-plani";
+  let state = null; // { konu, detay, plan: {basliklar:[{baslik,aciklama}], ipucu}, done: [] }
+  let ctl = null;
 
-  document.title = ODEV.konu + " · Sunum Planı";
-  $("hello").textContent = "Merhaba " + ODEV.isim + " 💕";
-  $("konu").textContent = ODEV.konu;
-  $("note").textContent = ODEV.not;
+  const save = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
+  try { state = JSON.parse(localStorage.getItem(STORE)); } catch (e) {}
 
-  const meta = [];
-  if (ODEV.ders) meta.push('<span class="pill"></span>');
-  $("meta").innerHTML = meta.join("");
-  if (ODEV.ders) $("meta").querySelector(".pill").textContent = ODEV.ders;
-  if (ODEV.teslimTarihi) {
-    const due = new Date(ODEV.teslimTarihi + "T23:59:00");
-    const days = Math.ceil((due - new Date()) / 86400000);
-    const s = document.createElement("span");
-    s.textContent = "Teslim: " + due.toLocaleDateString("tr-TR", { day: "numeric", month: "long" }) +
-      (days > 0 ? ` · ${days} gün kaldı` : days === 0 ? " · bugün!" : " · süre doldu");
-    $("meta").appendChild(s);
+  function render() {
+    if (!state || !state.plan) { $("result").hidden = true; return; }
+    $("result").hidden = false;
+    $("topicTitle").textContent = state.konu;
+    $("list").innerHTML = "";
+    state.plan.basliklar.forEach((b, i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<input type="checkbox" id="b${i}"><label for="b${i}">
+        <span class="num">${i + 1}</span><span><div class="title"></div><div class="desc"></div></span></label>`;
+      li.querySelector(".title").textContent = b.baslik;
+      li.querySelector(".desc").textContent = b.aciklama || "";
+      const cb = li.querySelector("input");
+      cb.checked = state.done.includes(i);
+      cb.addEventListener("change", () => {
+        state.done = cb.checked ? [...state.done, i] : state.done.filter(x => x !== i);
+        save(); progress();
+      });
+      $("list").appendChild(li);
+    });
+    $("tips").hidden = !state.plan.ipucu;
+    $("tipsText").textContent = state.plan.ipucu || "";
+    progress();
   }
 
-  ODEV.basliklar.forEach((b, i) => {
-    const li = document.createElement("li");
-    li.innerHTML = `<input type="checkbox" id="b${i}"><label for="b${i}">
-      <span class="num">${i + 1}</span><span><div class="title"></div><div class="desc"></div></span></label>`;
-    li.querySelector(".title").textContent = b.baslik;
-    li.querySelector(".desc").textContent = b.aciklama || "";
-    const cb = li.querySelector("input");
-    cb.checked = done.includes(i);
-    cb.addEventListener("change", () => {
-      done = cb.checked ? [...done, i] : done.filter(x => x !== i);
-      try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {}
-      update();
-    });
-    $("list").appendChild(li);
-  });
-
-  function update() {
-    const total = ODEV.basliklar.length, n = done.length;
+  function progress() {
+    const total = state.plan.basliklar.length, n = state.done.length;
     $("count").textContent = `${n} / ${total}`;
     $("fill").style.width = (total ? n / total * 100 : 0) + "%";
     $("celebrate").classList.toggle("show", total > 0 && n === total);
   }
-  update();
+
+  // Claude'a erişim yoksa kullanılacak genel şablon
+  function fallbackPlan(konu) {
+    return {
+      basliklar: [
+        { baslik: "Giriş", aciklama: `"${konu}" konusunu tanıt ve neden önemli olduğunu anlat.` },
+        { baslik: "Tanım ve Temel Kavramlar", aciklama: "Konuyu anlamak için gereken ana terimleri açıkla." },
+        { baslik: "Tarihçe / Arka Plan", aciklama: "Konunun nasıl ortaya çıktığını ve geliştiğini özetle." },
+        { baslik: "Ana Bölüm", aciklama: "Konunun en önemli yönlerini 2-3 alt başlıkta incele." },
+        { baslik: "Örnekler", aciklama: "Güncel ya da çarpıcı örneklerle destekle." },
+        { baslik: "Avantajlar ve Sorunlar", aciklama: "Olumlu ve olumsuz yanlarını karşılaştır." },
+        { baslik: "Sonuç ve Yorum", aciklama: "Kısa bir özet yap ve kendi görüşünü ekle." },
+        { baslik: "Kaynakça", aciklama: "Kullandığın kaynakları listele." }
+      ],
+      ipucu: ""
+    };
+  }
+
+  function errorText(code) {
+    switch (code) {
+      case "rate_limited": return "Şu an çok fazla istek var, biraz sonra tekrar dene.";
+      case "session_expired": return "Oturumun kapanmış, tekrar giriş yapıp dene.";
+      case "refused": return "Bu konu için öneri getiremedim, konuyu biraz farklı yazmayı dene.";
+      default: return "Bir sorun oldu, tekrar dener misin?";
+    }
+  }
+
+  async function suggest(fresh) {
+    const konu = $("konu").value.trim();
+    const detay = $("detay").value.trim();
+    if (!konu) return;
+    $("go").disabled = true; $("again").disabled = true;
+    $("status").textContent = "Düşünüyorum…";
+
+    const sample = window.claude ? await window.claude.use("sample").catch(() => null) : null;
+    if (!sample) {
+      state = { konu, detay, plan: fallbackPlan(konu), done: [] };
+      save(); render();
+      $("status").textContent = "Konuya özel öneri şu an kullanılamıyor, genel bir şablon gösteriyorum.";
+      $("go").disabled = false; $("again").disabled = false;
+      return;
+    }
+
+    ctl = new AbortController();
+    $("stop").hidden = false;
+    const prompt =
+`Bir üniversite öğrencisi aşağıdaki konuda bir sunum/ödev hazırlayacak. Bu konuya ÖZEL, mantıklı bir sırayla ilerleyen 6-9 başlık öner.
+Genel geçer başlıklar ("Giriş", "Sonuç" gibi) yerine mümkün olduğunca konunun kendisine özgü başlıklar kullan; giriş ve sonuç bölümleri olabilir ama onlar da konuya özgü adlandırılsın.
+Her başlık için o bölümde neyin anlatılması gerektiğini 1-2 kısa cümleyle Türkçe açıkla.
+Ayrıca sunumu güçlendirecek 1-2 cümlelik kısa bir ipucu ver.
+
+Konu: ${konu}
+${detay ? "Ek bilgi: " + detay : ""}
+
+Yalnızca şu biçimde JSON döndür, başka metin yazma:
+{"basliklar":[{"baslik":"...","aciklama":"..."}],"ipucu":"..."}`;
+
+    try {
+      const opts = { signal: ctl.signal };
+      if (fresh) opts.cache = false;
+      const plan = await sample.json(prompt, opts);
+      if (!plan || !Array.isArray(plan.basliklar) || !plan.basliklar.length) throw { code: "invalid_json" };
+      plan.basliklar = plan.basliklar
+        .filter(b => b && b.baslik)
+        .map(b => ({ baslik: String(b.baslik), aciklama: String(b.aciklama || "") }));
+      plan.ipucu = plan.ipucu ? String(plan.ipucu) : "";
+      state = { konu, detay, plan, done: [] };
+      save(); render();
+      $("status").textContent = "";
+    } catch (e) {
+      if (e && e.code === "cancelled") $("status").textContent = "";
+      else if (e && ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(e.code)) {
+        state = { konu, detay, plan: fallbackPlan(konu), done: [] };
+        save(); render();
+        $("status").textContent = "Konuya özel öneri için izin verilmedi, genel bir şablon gösteriyorum.";
+      } else $("status").textContent = errorText(e && e.code);
+    } finally {
+      $("go").disabled = false; $("again").disabled = false;
+      $("stop").hidden = true;
+    }
+  }
+
+  $("form").addEventListener("submit", e => { e.preventDefault(); suggest(false); });
+  $("again").addEventListener("click", () => suggest(true));
+  $("stop").addEventListener("click", () => ctl?.abort());
+
+  if (state) {
+    $("konu").value = state.konu || "";
+    $("detay").value = state.detay || "";
+  }
+  render();
 </script>
 </body>
 </html>
